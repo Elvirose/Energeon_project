@@ -4,12 +4,6 @@
 
 ---
 
-## 🎬 System Demonstration
-
-https://github.com/user-attachments/assets/4d22234f-f2d2-4c9e-9627-2752fe089cc5
-
----
-
 ## 🚀 Features
 
 ### 🔐 User Authentication
