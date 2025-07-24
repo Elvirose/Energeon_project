@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Energeon - Analysis</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Solway", "Arial", "sans-serif";
+        background-color: #fffaec;
+        color: #3d3d3d;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        color: #578e7e;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .navbar h1 a {
+        color: #f5ecd5;
+        text-decoration: none;
+      }
+      .btn-secondary {
+        border: none;
+        margin-top: 15px;
+        margin-bottom: 20px;
+      }
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+      .logo {
+        height: 50px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+      .home-icon {
+        color: black;
+        margin-left: 20px;
+      }
+
+      .home-button {
+        text-decoration: none; /* Removes underline */
+      }
+      .analysis-section {
+        margin-bottom: 20px;
+      }
+      .highlight {
+        font-weight: bold;
+        color: #ff5722;
+      }
+
+      .analysis-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #578e7e"
+    >
+      <div class="container">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white">Energeon</h1>
+        <div class="ml-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <a href="/" class="home-button">
+              <i class="fa-solid fa-house home-icon"></i>
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a class="dropdown-item" href="/views/settings">Device Info</a>
+              <a class="dropdown-item" href="/views/optimize">Optimize</a>
+              <a class="dropdown-item" href="/actualbill">Actual Bill</a>
+              <a class="dropdown-item" href="/visualization">Visualization</a>
+              <a class="dropdown-item" href="/analysis">Analysis</a>
+              <a class="dropdown-item" style="color: crimson" href="user/login"
+                >Log Out</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="analysis-container">
+      <h1>Electricity Bill Analysis</h1>
+      <p class="text-center">
+        Key insights based on your electricity usage trends
+      </p>
+
+      <div class="analysis-section">
+        <h4>
+          <i class="fa-solid fa-bolt"></i>Estimated vs. Actual Bill Trends
+        </h4>
+        <p>
+          Over the past few months, your
+          <span class="highlight">actual electricity bill</span> has been
+          <span id="bill-trend"></span> compared to your estimated bill.
+        </p>
+      </div>
+
+      <div class="analysis-section">
+        <h4>
+          <i class="fa-solid fa-bolt"></i> Peak & Lowest Consumption Months
+        </h4>
+        <p>
+          The month with the <span class="highlight">highest bill</span> was
+          <span id="highest-month"></span>, while the
+          <span class="highlight">lowest bill</span> was in
+          <span id="lowest-month"></span>.
+        </p>
+      </div>
+
+      <div class="analysis-section">
+        <h4><i class="fa-solid fa-bolt"></i> Monthly Breakdown</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Estimated Bill (₹)</th>
+              <th>Actual Bill (₹)</th>
+              <th>Difference (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="monthly-breakdown"></tbody>
+        </table>
+      </div>
+
+      <div class="analysis-section">
+        <h4><i class="fa-solid fa-bolt"></i> Recommendations</h4>
+        <ul id="recommendations"></ul>
+      </div>
+    </main>
+
+    <script>
+      async function fetchAnalysisData() {
+        const response = await fetch("/get-bill-data");
+        const data = await response.json();
+        analyzeData(data);
+      }
+
+      function analyzeData(data) {
+        if (!data || data.length === 0) return;
+
+        let totalDiff = 0;
+        let highestMonth = "";
+        let lowestMonth = "";
+        let maxBill = -Infinity;
+        let minBill = Infinity;
+        let totalVariation = 0;
+        let monthlyBreakdownHtml = "";
+
+        data.forEach((item, index) => {
+          const actualBill = item.actualBill || 0;
+          const estimatedBill = item.estimatedBill || 0;
+          const difference = actualBill - estimatedBill;
+          totalDiff += difference;
+
+          if (actualBill > maxBill) {
+            maxBill = actualBill;
+            highestMonth = item.yearMonth;
+          }
+          if (actualBill < minBill) {
+            minBill = actualBill;
+            lowestMonth = item.yearMonth;
+          }
+
+          if (index > 0) {
+            totalVariation += Math.abs(
+              data[index].actualBill - data[index - 1].actualBill
+            );
+          }
+
+          monthlyBreakdownHtml += `
+          <tr>
+            <td>${item.yearMonth}</td>
+            <td>₹${estimatedBill}</td>
+            <td>₹${actualBill}</td>
+            <td class="highlight">₹${difference}</td>
+          </tr>
+        `;
+        });
+
+        document.getElementById("bill-trend").innerText =
+          totalDiff > 0 ? "higher than expected" : "lower than expected";
+        document.getElementById("highest-month").innerText = highestMonth;
+        document.getElementById("lowest-month").innerText = lowestMonth;
+        document.getElementById("monthly-breakdown").innerHTML =
+          monthlyBreakdownHtml;
+
+        const recommendationsList = document.getElementById("recommendations");
+        recommendationsList.innerHTML = "";
+
+        const recommendations = [
+          "Use energy-efficient appliances and LED bulbs.",
+          "Unplug devices when not in use to prevent phantom load.",
+          "Adjust AC temperature to 24-26°C to optimize cooling costs.",
+          "Run high-power appliances like washing machines during off-peak hours.",
+          "Consider installing solar panels for long-term savings.",
+          "Monitor and limit excessive usage of heating devices.",
+          "Ensure periodic maintenance of electrical devices for efficiency.",
+          totalDiff > 0
+            ? "Your bill is higher than expected. Analyze unnecessary consumption."
+            : "Your energy consumption is well-optimized! Keep it up.",
+        ];
+
+        recommendations.forEach((rec) => {
+          const li = document.createElement("li");
+          li.textContent = rec;
+          recommendationsList.appendChild(li);
+        });
+      }
+
+      fetchAnalysisData();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignUp & Registration Form</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Solway:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Solway", sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #578e7e;
+        color: #578e7e;
+      }
+
+      .wrapper {
+        position: relative;
+        width: 400px;
+        height: 500px;
+        background: #fff;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        border-radius: 20px;
+        padding: 40px;
+        overflow: hidden;
+      }
+
+      .form-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      h2 {
+        font-size: 30px;
+        color: #578e7e;
+        text-align: center;
+      }
+
+      .input-group {
+        position: relative;
+        margin: 30px 0;
+        border-bottom: 2px solid #578e7e;
+      }
+
+      .input-group label {
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #578e7e;
+        pointer-events: none;
+        transition: 0.3s ease-in-out;
+      }
+
+      .input-group input {
+        width: 320px;
+        height: 40px;
+        font-size: 16px;
+        color: #333;
+        padding: 10px 5px 0;
+        background: transparent;
+        border: none;
+        outline: none;
+      }
+
+      .input-group input:focus ~ label,
+      .input-group input:not(:placeholder-shown) ~ label {
+        top: -10px;
+        font-size: 14px;
+        color: #333;
+      }
+
+      button {
+        width: 100%;
+        height: 40px;
+        background: #578e7e;
+        box-shadow: 0 0 10px #578e7e;
+        font-size: 16px;
+        color: #fff;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+      }
+
+      .signUp-link {
+        font-size: 14px;
+        text-align: center;
+        margin: 15px 0;
+      }
+
+      .signUp-link p {
+        color: #578e7e;
+      }
+
+      .signUp-link p a {
+        color: #578e7e;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .signUp-link p a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="form-wrapper sign-in">
+        <form action="/user/signup" method="POST">
+          <h2>Sign Up</h2>
+          <div class="input-group">
+            <input type="text" name="name" required placeholder=" " />
+            <label for="name">Name</label>
+          </div>
+          <div class="input-group">
+            <input type="email" name="email" required placeholder=" " />
+            <label for="email">Email</label>
+          </div>
+          <div class="input-group">
+            <input type="password" name="password" required placeholder=" " />
+            <label for="password">Password</label>
+          </div>
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

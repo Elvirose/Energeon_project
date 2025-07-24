@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Energeon - Visualization</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Solway", "Arial", "sans-serif";
+        background-color: #fffaec;
+        color: #3d3d3d;
+      }
+
+      .chart-container {
+        max-width: 800px;
+        margin: 60px auto;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        color: #578e7e;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .navbar h1 a {
+        color: #f5ecd5;
+        text-decoration: none;
+      }
+
+      .btn-secondary {
+        border: none;
+        margin-top: 15px;
+        margin-bottom: 20px;
+      }
+
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+      .logo {
+        height: 50px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+
+      .home-icon {
+        color: black;
+        margin-left: 20px;
+      }
+
+      .home-button {
+        text-decoration: none; /* Removes underline */
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #578e7e"
+    >
+      <div class="container">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white">Energeon</h1>
+        <div class="ml-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <a href="/" class="home-button">
+              <i class="fa-solid fa-house home-icon"></i>
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a class="dropdown-item" href="/views/settings">Device Info</a>
+              <a class="dropdown-item" href="/views/optimize">Optimize</a>
+              <a class="dropdown-item" href="/actualbill">Actual Bill</a>
+              <a class="dropdown-item" href="/visualization">Visualization</a>
+              <a class="dropdown-item" href="/analysis">Analysis</a>
+              <a class="dropdown-item" style="color: crimson" href="user/login"
+                >Log Out</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Electricity Bill Insights & Analysis</h1>
+      <p class="text-center">Visualize trends with interactive charts</p>
+    </main>
+    <!-- Line Chart -->
+    <div class="chart-container">
+      <h4>Estimated vs. Actual Bill</h4>
+      <canvas id="billChart"></canvas>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="chart-container">
+      <h4>Actual Bill Per Month</h4>
+      <canvas id="billBarChart"></canvas>
+    </div>
+
+    <script>
+      async function fetchBillData() {
+        const response = await fetch("/get-bill-data"); // Fetch data from backend
+        const data = await response.json();
+        renderLineChart(data);
+        renderBarChart(data);
+      }
+
+      function renderLineChart(data) {
+        const labels = data.map((item) => item.yearMonth);
+        const estimatedBill = data.map((item) => item.estimatedBill || 0);
+        const actualBill = data.map((item) => item.actualBill || 0);
+
+        new Chart(document.getElementById("billChart").getContext("2d"), {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Estimated Bill (₹)",
+                data: estimatedBill,
+                borderColor: "#00bcd4",
+                backgroundColor: "rgba(0, 188, 212, 0.2)",
+                borderWidth: 2,
+                pointRadius: 5,
+                pointBackgroundColor: "#00bcd4",
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: "Actual Bill (₹)",
+                data: actualBill,
+                borderColor: "#ff5722",
+                backgroundColor: "rgba(255, 87, 34, 0.2)",
+                borderWidth: 2,
+                pointRadius: 5,
+                pointBackgroundColor: "#ff5722",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: true, position: "top" } },
+            scales: {
+              x: { grid: { display: false } },
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+
+      function renderBarChart(data) {
+        const labels = data.map((item) => item.yearMonth);
+        const actualBill = data.map((item) => item.actualBill || 0);
+
+        new Chart(document.getElementById("billBarChart").getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Actual Bill (₹)",
+                data: actualBill,
+                backgroundColor: "rgba(255, 87, 34, 0.6)",
+                borderColor: "rgba(255, 87, 34, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+
+      fetchBillData(); // Fetch data and render charts on page load
+    </script>
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Energeon - Household Electricity Usage Estimator</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Solway", "Arial", sans-serif;
+        background-color: #fffaec;
+        color: #3d3d3d;
+      }
+
+      .tagline {
+        font-size: 1.2em;
+        color: #578e7e;
+      }
+
+      .container {
+        text-align: center;
+        padding: 30px;
+      }
+
+      h1 {
+        font-size: 3em;
+        color: #578e7e;
+      }
+
+      .btn-secondary {
+        background-color: #578e7e;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 45px;
+        margin-left: 10px;
+        transition: transform 0.2s ease-in-out, background-color 0.3s;
+      }
+
+      .btn-secondary:hover {
+        background-color: #3d3d3d;
+        transform: scale(1.05);
+      }
+
+      .card {
+        border: none;
+        background-color: #f5ecd5;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .card-body i {
+        font-size: 50px;
+        color: #578e7e;
+        transition: color 0.3s ease-in-out;
+      }
+
+      .card-title {
+        color: #3d3d3d;
+      }
+
+      .card-text {
+        color: #3d3d3d;
+      }
+
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+
+      .navbar {
+        background-color: #578e7e;
+      }
+
+      .logo {
+        height: 70px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+      .welcome-text {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 0;
+        opacity: 1; /* Keep text visible at the end */
+        animation: slowTyping 4s steps(40, end) forwards;
+      }
+
+      @keyframes slowTyping {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container d-flex align-items-center justify-content-start">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white ml-2 mb-0">Energeon</h1>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1 class="welcome-text">Welcome to Energeon</h1>
+      <p class="tagline">
+        Energeon helps you estimate and optimize household electricity usage,
+        aiming for smarter energy consumption.
+      </p>
+      <a class="btn btn-secondary" href="user/login">Login</a>
+      <a class="btn btn-secondary" href="user/signup">Sign Up</a>
+
+      <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <i class="fas fa-bolt"></i>
+              <h3 class="card-title">Energy Estimator</h3>
+              <p class="card-text">
+                Estimate your household's electricity consumption based on
+                appliances and usage.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <i class="fas fa-cogs"></i>
+              <h3 class="card-title">Optimization Tips</h3>
+              <p class="card-text">
+                Get recommendations on how to reduce your electricity usage and
+                lower your bills.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <i class="fas fa-chart-line"></i>
+              <h3 class="card-title">Usage Analytics</h3>
+              <p class="card-text">
+                Analyze your electricity consumption patterns with
+                easy-to-understand reports.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Energeon - Usage and Bill Estimation</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Solway", "Arial", "sans-serif";
+        background-color: #fffaec;
+        color: #3d3d3d;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        color: #578e7e;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .navbar h1 a {
+        color: #f5ecd5;
+        text-decoration: none;
+      }
+
+      .card-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .card {
+        margin-bottom: 15px;
+      }
+
+      .slider-container {
+        margin: 20px 0;
+      }
+
+      .bill-container {
+        font-size: 1.5em;
+        font-weight: bold;
+        padding: 20px;
+        text-align: center;
+        border: 2px solid #578e7e;
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+
+      .bill-warning {
+        color: red;
+        border-color: red;
+      }
+
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+
+      .btn-secondary {
+        border: none;
+        margin-top: 15px;
+        margin-bottom: 20px;
+      }
+
+      .submit-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 1.2em;
+        color: #fff;
+        background-color: #578e7e;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+      }
+
+      .submit-btn:hover {
+        background-color: #446e61;
+      }
+      .logo {
+        height: 50px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+      .home-icon {
+        color: black;
+        margin-left: 20px;
+      }
+
+      .home-button {
+        text-decoration: none; /* Removes underline */
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #578e7e"
+    >
+      <div class="container">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white">Energeon</h1>
+        <div class="ml-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <a href="/" class="home-button">
+              <i class="fa-solid fa-house home-icon"></i>
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a class="dropdown-item" href="/views/settings">Device Info</a>
+              <a class="dropdown-item" href="/views/optimize">Optimize</a>
+              <a class="dropdown-item" href="/actualbill">Actual Bill</a>
+              <a class="dropdown-item" href="/visualization">Visualization</a>
+              <a class="dropdown-item" href="/analysis">Analysis</a>
+              <a class="dropdown-item" style="color: crimson" href="user/login"
+                >Log Out</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Electricity Usage and Bill Estimation</h1>
+      <p class="text-center">
+        Adjust the hours of usage for each device, select a month and year, and
+        set a target budget.
+      </p>
+      <form action="/save/optimize" method="POST">
+        <div class="form-group">
+          <label for="month">Select Month:</label>
+          <input
+            type="month"
+            id="month"
+            name="year_month"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="target-budget">Target Budget (INR):</label>
+          <input
+            type="number"
+            id="target-budget"
+            class="form-control"
+            placeholder="Enter your budget in INR"
+            name="target_bill"
+            required
+          />
+        </div>
+        <button
+          type="button"
+          id="auto-generate"
+          class="btn btn-primary"
+          style="display: block; margin: 0 auto; margin-bottom: 20px"
+        >
+          Auto Generate
+        </button>
+
+        <div id="device-cards" class="card-container">
+          <div class="row">
+            <!-- Card for Fan -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Fan Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.fan_power%> W, Quantity:
+                    <%=settings.fan_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="fan-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_fan"
+                  />
+                  <p id="fan-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Bulb -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Bulb Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.bulb_power%> W, Quantity:
+                    <%=settings.bulb_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="bulb-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_bulb"
+                  />
+                  <p id="bulb-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for TV -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Television Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.tv_power%> W, Quantity:
+                    <%=settings.tv_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="tv-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_tv"
+                  />
+                  <p id="tv-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Washing Machine -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Washing Machine Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.wash_power%> W, Quantity:
+                    <%=settings.wash_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="wash-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_wash"
+                  />
+                  <p id="wash-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Iron Box -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Iron Box Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.ironbox_power%> W, Quantity:
+                    <%=settings.ironbox_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="ironbox-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_ironbox"
+                  />
+                  <p id="ironbox-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Refrigerator -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Refrigerator Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.refrigerator_power%> W, Quantity:
+                    <%=settings.refrigerator_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="refrigerator-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_refrigerator"
+                  />
+                  <p id="refrigerator-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Heater -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Heater Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.heater_power%> W, Quantity:
+                    <%=settings.heater_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="heater-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_heater"
+                  />
+                  <p id="heater-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for Oven -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Oven Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.oven_power%> W, Quantity:
+                    <%=settings.oven_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="oven-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_oven"
+                  />
+                  <p id="oven-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for AC -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">AC Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.ac_power%> W, Quantity:
+                    <%=settings.ac_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="ac-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_ac"
+                  />
+                  <p id="ac-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for device1 -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Device 1 Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.device1_power%> W, Quantity:
+                    <%=settings.device1_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="device1-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_device1"
+                  />
+                  <p id="device1-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for device 2 -->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Device 2 Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.device2_power%> W, Quantity:
+                    <%=settings.device2_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="device2-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_device2"
+                  />
+                  <p id="device2-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card for device 3-->
+            <div class="col-md-4">
+              <div class="card" style="width: 100%">
+                <div class="card-body">
+                  <h5 class="card-title">Device 3 Usage</h5>
+                  <p class="card-text">Adjust the hours of usage per day.</p>
+                  <p class="card-text">
+                    Power: <%=settings.device3_power%> W, Quantity:
+                    <%=settings.device3_quantity%>
+                  </p>
+                  <input
+                    type="range"
+                    id="device3-hours"
+                    min="0"
+                    max="24"
+                    value="0"
+                    name="hrs_device3"
+                  />
+                  <p id="device3-value">0 hrs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bill-container" class="bill-container">
+          Estimated Bill: <span id="bill-amount">0</span>
+          <input
+            type="hidden"
+            id="input-bill-amount"
+            name="estimated_bill"
+            value="0"
+          />
+          INR
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+
+    <script>
+      const powerRatings = {
+        fan: "<%=settings.fan_power%>", // Power rating in Watts
+        bulb: "<%=settings.bulb_power%>",
+        tv: "<%=settings.tv_power%>",
+        wash: "<%=settings.wash_power%>",
+        ironbox: "<%=settings.ironbox_power%>",
+        refrigerator: "<%=settings.refrigerator_power%>",
+        heater: "<%=settings.heater_power%>",
+        oven: "<%=settings.oven_power%>",
+        ac: "<%=settings.ac_power%>",
+        device1: "<%=settings.device1_power%>",
+        device2: "<%=settings.device2_power%>",
+        device3: "<%=settings.device3_power%>",
+      };
+
+      const quantity = {
+        fan: "<%=settings.fan_quantity%>", // quantity rating in Watts
+        bulb: "<%=settings.bulb_quantity%>",
+        tv: "<%=settings.tv_quantity%>",
+        wash: "<%=settings.wash_quantity%>",
+        ironbox: "<%=settings.ironbox_quantity%>",
+        refrigerator: "<%=settings.refrigerator_quantity%>",
+        heater: "<%=settings.heater_quantity%>",
+        oven: "<%=settings.oven_quantity%>",
+        ac: "<%=settings.ac_quantity%>",
+        device1: "<%=settings.device1_quantity%>",
+        device2: "<%=settings.device2_quantity%>",
+        device3: "<%=settings.device3_quantity%>",
+      };
+
+      // Tariff rates array
+      const tariffRates = [
+        { maxUnits: 50, rate: 3.25 },
+        { maxUnits: 100, rate: 4.05 },
+        { maxUnits: 150, rate: 5.1 },
+        { maxUnits: 200, rate: 6.95 },
+        { maxUnits: 250, rate: 8.2 },
+        { maxUnits: Infinity, rate: 8.8 },
+      ];
+
+      let targetBudget =
+        parseFloat(document.getElementById("target-budget").value) || 0;
+
+      // Function to calculate the electricity bill based on units
+      function calculateBillBasedOnTariff(units) {
+        let totalBill = 0;
+        let remainingUnits = units;
+
+        for (let i = 0; i < tariffRates.length; i++) {
+          const { maxUnits, rate } = tariffRates[i];
+
+          if (remainingUnits > 0) {
+            const unitsAtThisRate = Math.min(
+              remainingUnits,
+              maxUnits - (tariffRates[i - 1]?.maxUnits || 0)
+            );
+            totalBill += unitsAtThisRate * rate;
+            remainingUnits -= unitsAtThisRate;
+          } else {
+            break;
+          }
+        }
+
+        return totalBill.toFixed(2); // Return the bill rounded to 2 decimal places
+      }
+
+      // Function to calculate total consumption and update the bill
+      function calculateBill() {
+        const fanHours = parseInt(document.getElementById("fan-hours").value);
+        const bulbHours = parseInt(document.getElementById("bulb-hours").value);
+        const tvHours = parseInt(document.getElementById("tv-hours").value);
+        const washHours = parseInt(document.getElementById("wash-hours").value);
+        const ironboxHours = parseInt(
+          document.getElementById("ironbox-hours").value
+        );
+        const refrigeratorHours = parseInt(
+          document.getElementById("refrigerator-hours").value
+        );
+        const heaterHours = parseInt(
+          document.getElementById("heater-hours").value
+        );
+        const ovenHours = parseInt(document.getElementById("oven-hours").value);
+        const acHours = parseInt(document.getElementById("ac-hours").value);
+        const device1Hours = parseInt(
+          document.getElementById("device1-hours").value
+        );
+        const device2Hours = parseInt(
+          document.getElementById("device2-hours").value
+        );
+        const device3Hours = parseInt(
+          document.getElementById("device3-hours").value
+        );
+
+        // Calculate total energy consumption in kWh (for 60 days)
+        const fanConsumption =
+          (powerRatings.fan * fanHours * quantity.fan * 60) / 1000;
+        const bulbConsumption =
+          (powerRatings.bulb * bulbHours * quantity.bulb * 60) / 1000;
+        const tvConsumption =
+          (powerRatings.tv * tvHours * quantity.tv * 60) / 1000;
+        const washConsumption =
+          (powerRatings.wash * washHours * quantity.wash * 60) / 1000;
+        const refrigeratorConsumption =
+          (powerRatings.refrigerator *
+            refrigeratorHours *
+            quantity.refrigerator *
+            60) /
+          1000;
+        const ironboxConsumption =
+          (powerRatings.ironbox * ironboxHours * quantity.ironbox * 60) / 1000;
+        const heaterConsumption =
+          (powerRatings.heater * heaterHours * quantity.heater * 60) / 1000;
+        const ovenConsumption =
+          (powerRatings.oven * ovenHours * quantity.oven * 60) / 1000;
+        const acConsumption =
+          (powerRatings.ac * acHours * quantity.ac * 60) / 1000;
+        const device1Consumption =
+          (powerRatings.device1 * device1Hours * quantity.device1 * 60) / 1000;
+        const device2Consumption =
+          (powerRatings.device2 * device2Hours * quantity.device2 * 60) / 1000;
+        const device3Consumption =
+          (powerRatings.device3 * device3Hours * quantity.device3 * 60) / 1000;
+
+        const totalConsumption =
+          fanConsumption +
+          bulbConsumption +
+          tvConsumption +
+          washConsumption +
+          refrigeratorConsumption +
+          ironboxConsumption +
+          heaterConsumption +
+          ovenConsumption +
+          acConsumption +
+          device1Consumption +
+          device2Consumption +
+          device3Consumption;
+
+        // Calculate the bill based on tiered pricing
+        const estimatedBill = calculateBillBasedOnTariff(totalConsumption);
+
+        document.getElementById(
+          "bill-amount"
+        ).textContent = `₹ ${estimatedBill}`;
+        document.getElementById("input-bill-amount").value = estimatedBill;
+
+        // Check if bill exceeds target budget
+        const billContainer = document.getElementById("bill-container");
+        if (targetBudget > 0 && parseFloat(estimatedBill) > targetBudget) {
+          billContainer.classList.add("bill-warning");
+          let warningSound = new Audio("/sound.mp3");
+          warningSound.play();
+        } else {
+          billContainer.classList.remove("bill-warning");
+        }
+      }
+
+      document
+        .getElementById("auto-generate")
+        .addEventListener("click", function () {
+          let budget =
+            parseFloat(document.getElementById("target-budget").value) || 0;
+          if (budget <= 0) {
+            alert("Please enter a valid budget.");
+            return;
+          }
+
+          let totalPowerUsage = 0;
+          let adjustableDevices = Object.keys(powerRatings).filter(
+            (device) => parseFloat(powerRatings[device]) > 0
+          );
+
+          if (adjustableDevices.length === 0) {
+            alert("No devices available for adjustment.");
+            return;
+          }
+
+          let estimatedCost = 0;
+          let hoursAssigned = {};
+          let minBillRange = budget - 100;
+          let maxBillRange = budget;
+
+          // Calculate max possible bill if all devices run for 24 hours
+          totalPowerUsage = 0;
+          adjustableDevices.forEach((device) => {
+            totalPowerUsage +=
+              parseFloat(powerRatings[device]) *
+              parseInt(quantity[device]) *
+              24;
+          });
+          let maxPossibleBill = calculateBillBasedOnTariff(
+            (totalPowerUsage / 1000) * 60
+          );
+
+          // Calculate minimum possible bill if all devices run for 1 hour
+          totalPowerUsage = 0;
+          adjustableDevices.forEach((device) => {
+            totalPowerUsage +=
+              parseFloat(powerRatings[device]) * parseInt(quantity[device]) * 1;
+          });
+          let minPossibleBill = calculateBillBasedOnTariff(
+            (totalPowerUsage / 1000) * 60
+          );
+
+          if (budget > maxPossibleBill) {
+            alert(
+              "The maximum possible bill is " +
+                maxPossibleBill +
+                " INR. Setting all devices to 24 hours."
+            );
+            estimatedCost = maxPossibleBill;
+            adjustableDevices.forEach((device) => {
+              let slider = document.getElementById(device + "-hours");
+              slider.value = 24;
+              document.getElementById(device + "-value").textContent = "24 hrs";
+            });
+          } else if (budget < minPossibleBill) {
+            alert(
+              "The minimum possible bill is " +
+                minPossibleBill +
+                " INR. Setting all devices to 1 hour."
+            );
+            estimatedCost = minPossibleBill;
+            adjustableDevices.forEach((device) => {
+              let slider = document.getElementById(device + "-hours");
+              slider.value = 1;
+              document.getElementById(device + "-value").textContent = "1 hr";
+            });
+          } else {
+            do {
+              totalPowerUsage = 0;
+              adjustableDevices.forEach((device) => {
+                let randomHours = Math.floor(Math.random() * (24 - 1) + 1); // Random integer between 1 and 24
+                hoursAssigned[device] = randomHours;
+                totalPowerUsage +=
+                  parseFloat(powerRatings[device]) *
+                  parseInt(quantity[device]) *
+                  randomHours;
+              });
+
+              estimatedCost = calculateBillBasedOnTariff(
+                (totalPowerUsage / 1000) * 60
+              );
+            } while (
+              estimatedCost < minBillRange ||
+              estimatedCost > maxBillRange
+            );
+
+            adjustableDevices.forEach((device) => {
+              let slider = document.getElementById(device + "-hours");
+              let adjustedHours = hoursAssigned[device]; // Keep it an integer
+              slider.value = adjustedHours;
+              document.getElementById(device + "-value").textContent =
+                adjustedHours + " hrs";
+            });
+          }
+
+          calculateBill(); // Recalculate bill with new values
+        });
+      // Real-time slider value updates
+      document.getElementById("fan-hours").addEventListener("input", (e) => {
+        document.getElementById("fan-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document.getElementById("bulb-hours").addEventListener("input", (e) => {
+        document.getElementById("bulb-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document.getElementById("tv-hours").addEventListener("input", (e) => {
+        document.getElementById("tv-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document.getElementById("wash-hours").addEventListener("input", (e) => {
+        document.getElementById("wash-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document
+        .getElementById("ironbox-hours")
+        .addEventListener("input", (e) => {
+          document.getElementById("ironbox-value").textContent =
+            e.target.value + " hrs";
+          calculateBill();
+        });
+
+      document
+        .getElementById("refrigerator-hours")
+        .addEventListener("input", (e) => {
+          document.getElementById("refrigerator-value").textContent =
+            e.target.value + " hrs";
+          calculateBill();
+        });
+
+      document.getElementById("heater-hours").addEventListener("input", (e) => {
+        document.getElementById("heater-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document.getElementById("oven-hours").addEventListener("input", (e) => {
+        document.getElementById("oven-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+
+      document.getElementById("ac-hours").addEventListener("input", (e) => {
+        document.getElementById("ac-value").textContent =
+          e.target.value + " hrs";
+        calculateBill();
+      });
+      document
+        .getElementById("device1-hours")
+        .addEventListener("input", (e) => {
+          document.getElementById("device1-value").textContent =
+            e.target.value + " hrs";
+          calculateBill();
+        });
+
+      document
+        .getElementById("device2-hours")
+        .addEventListener("input", (e) => {
+          document.getElementById("device2-value").textContent =
+            e.target.value + " hrs";
+          calculateBill();
+        });
+
+      document
+        .getElementById("device3-hours")
+        .addEventListener("input", (e) => {
+          document.getElementById("device3-value").textContent =
+            e.target.value + " hrs";
+          calculateBill();
+        });
+
+      // Update target budget whenever the user modifies it
+      document
+        .getElementById("target-budget")
+        .addEventListener("input", (e) => {
+          targetBudget = parseFloat(e.target.value) || 0;
+          calculateBill();
+        });
+
+      // Initial bill calculation if a target budget is set
+      calculateBill();
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Energeon - Device Information</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Solway", "Arial", sans-serif;
+        background-color: #fffaec;
+        color: #3d3d3d;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        color: #578e7e;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        border: none;
+        background-color: #f5ecd5;
+      }
+
+      .card-body i {
+        font-size: 50px;
+        color: #578e7e;
+      }
+
+      .card-title {
+        color: #3d3d3d;
+      }
+
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+
+      .navbar {
+        background-color: #578e7e;
+      }
+
+      .navbar h1 a {
+        color: #f5ecd5;
+        text-decoration: none;
+      }
+
+      .form-control {
+        margin-bottom: 10px;
+      }
+
+      .btn-secondary {
+        border: none;
+        margin-top: 15px;
+        margin-bottom: 20px;
+      }
+
+      .submit-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 1.2em;
+        color: #fff;
+        background-color: #578e7e;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+      }
+
+      .submit-btn:hover {
+        background-color: #446e61;
+      }
+
+      .btn-secondary:hover {
+        background-color: #3d3d3d;
+      }
+      .logo {
+        height: 50px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+      .home-icon {
+        color: black;
+        margin-left: 20px;
+      }
+
+      .home-button {
+        text-decoration: none; /* Removes underline */
+      }
+    </style>
+    <script>
+      function toggleEditMode() {
+        const inputs = document.querySelectorAll(".device-input");
+        const isDisabled = inputs[0].disabled;
+
+        inputs.forEach((input) => {
+          input.disabled = !isDisabled;
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white">Energeon</h1>
+        <div class="ml-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <a href="/" class="home-button">
+              <i class="fa-solid fa-house home-icon"></i>
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a class="dropdown-item" href="/views/settings">Device Info</a>
+              <a class="dropdown-item" href="/views/optimize">Optimize</a>
+              <a class="dropdown-item" href="/actualbill">Actual Bill</a>
+              <a class="dropdown-item" href="/visualization">Visualization</a>
+              <a class="dropdown-item" href="/analysis">Analysis</a>
+              <a class="dropdown-item" style="color: crimson" href="user/login"
+                >Log Out</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Device Information</h1>
+      <p class="text-center mb-5">
+        Provide details about the devices in your household.
+      </p>
+
+      <div class="text-center mt-4">
+        <button
+          id="edit-button"
+          class="btn btn-secondary"
+          onclick="toggleEditMode()"
+        >
+          Edit
+        </button>
+      </div>
+
+      <form action="/save/settings" method="POST">
+        <div class="row">
+          <!-- Fan Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fas fa-fan"></i>
+                <h3 class="card-title">Fan</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_fan"
+                  value="<%=settings.fan_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_fan"
+                  value="<%=settings.fan_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Bulb Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fas fa-lightbulb"></i>
+                <h3 class="card-title">Bulb</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_bulb"
+                  value="<%=settings.bulb_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_bulb"
+                  value="<%=settings.bulb_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Television Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fas fa-tv"></i>
+                <h3 class="card-title">Television</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_tv"
+                  value="<%=settings.tv_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_tv"
+                  value="<%=settings.tv_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Washing Machine Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fas fa-tshirt"></i>
+                <h3 class="card-title">Washing Machine</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_wash"
+                  value="<%=settings.wash_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_wash"
+                  value="<%=settings.wash_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Iron box Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-temperature-three-quarters"></i>
+                <h3 class="card-title">Iron Box</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_ironbox"
+                  value="<%=settings.ironbox_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_ironbox"
+                  value="<%=settings.ironbox_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Refrigerator Card -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-snowflake"></i>
+                <h3 class="card-title">Refrigerator</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_refrigerator"
+                  value="<%=settings.refrigerator_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_refrigerator"
+                  value="<%=settings.refrigerator_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Heater -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-hot-tub-person"></i>
+                <h3 class="card-title">Heater</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_heater"
+                  value="<%=settings.heater_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_heater"
+                  value="<%=settings.heater_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Oven -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-hard-drive"></i>
+                <h3 class="card-title">Oven</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_oven"
+                  value="<%=settings.oven_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_oven"
+                  value="<%=settings.oven_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- AC -->
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-wind"></i>
+                <h3 class="card-title">AC</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_ac"
+                  value="<%=settings.ac_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_ac"
+                  value="<%=settings.ac_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-plug"></i>
+                <h3 class="card-title">Device 1</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_device1"
+                  value="<%=settings.device1_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_device1"
+                  value="<%=settings.device1_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-plug"></i>
+                <h3 class="card-title">Device 2</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_device2"
+                  value="<%=settings.device2_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_device2"
+                  value="<%=settings.device2_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-plug"></i>
+                <h3 class="card-title">Device 3</h3>
+                <label>Power: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Power (Watts)"
+                  name="pow_device3"
+                  value="<%=settings.device3_power%>"
+                  disabled
+                />
+                <label>Quantity: </label>
+                <input
+                  type="number"
+                  class="device-input"
+                  placeholder="Quantity"
+                  name="qty_device3"
+                  value="<%=settings.device3_quantity%>"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button id="submit-button" type="submit" class="submit-btn">
+            Submit
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Energeon - Usage Chart</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=Solway:wght@300;400;500;700;800&family=Ysabeau+SC:wght@1..1000&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Solway", "Arial", "sans-serif";
+        background-color: #fffaec;
+        color: #3d3d3d;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        color: #578e7e;
+        margin-top: 48px;
+        margin-bottom: 30px;
+      }
+
+      h3 {
+        font-size: 1.5em;
+        color: #578e7e;
+        margin-top: 48px;
+        margin-bottom: 30px;
+      }
+      .btn-secondary {
+        border: none;
+        margin-top: 15px;
+        margin-bottom: 20px;
+      }
+      .logo {
+        height: 50px; /* Adjust size */
+        width: auto;
+        margin-right: 10px; /* Space between logo and text */
+        vertical-align: middle;
+      }
+      .home-icon {
+        color: black;
+        margin-left: 20px;
+      }
+
+      .home-button {
+        text-decoration: none; /* Removes underline */
+      }
+
+      footer {
+        background-color: #3d3d3d;
+        color: #f5ecd5;
+        padding: 15px 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #578e7e"
+    >
+      <div class="container">
+        <img src="/logo.png" class="logo" />
+        <h1 class="text-white">Energeon</h1>
+
+        <div class="ml-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <a href="/" class="home-button">
+              <i class="fa-solid fa-house home-icon"></i>
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a class="dropdown-item" href="/views/settings">Device Info</a>
+              <a class="dropdown-item" href="/views/optimize">Optimize</a>
+              <a class="dropdown-item" href="/actualbill">Actual Bill</a>
+              <a class="dropdown-item" href="/visualization">Visualization</a>
+              <a class="dropdown-item" href="/analysis">Analysis</a>
+              <a class="dropdown-item" style="color: crimson" href="/"
+                >Log Out</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <h1>Device Usage Chart</h1>
+    <canvas
+      id="usageChart"
+      width="400"
+      height="400"
+      style="margin: 100px auto"
+    ></canvas>
+
+    <h3>Mail has been send successfully!</h3>
+
+    <footer>
+      <p>&copy; 2025 Energeon - All rights reserved</p>
+    </footer>
+
+    <script>
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const fanHours = parseInt(urlParams.get("fan")) || 0;
+      const bulbHours = parseInt(urlParams.get("bulb")) || 0;
+      const tvHours = parseInt(urlParams.get("tv")) || 0;
+      const washHours = parseInt(urlParams.get("wash")) || 0;
+      const ironboxHours = parseInt(urlParams.get("ironbox")) || 0;
+      const refrigeratorHours = parseInt(urlParams.get("refrigerator")) || 0;
+      const heaterHours = parseInt(urlParams.get("heater")) || 0;
+      const ovenHours = parseInt(urlParams.get("oven")) || 0;
+      const acHours = parseInt(urlParams.get("ac")) || 0;
+      const device1Hours = parseInt(urlParams.get("device1")) || 0;
+      const device2Hours = parseInt(urlParams.get("device2")) || 0;
+      const device3Hours = parseInt(urlParams.get("device3")) || 0;
+
+      const totalHours =
+        fanHours +
+        bulbHours +
+        tvHours +
+        washHours +
+        ironboxHours +
+        refrigeratorHours +
+        heaterHours +
+        ovenHours +
+        acHours +
+        device1Hours +
+        device2Hours +
+        device3Hours;
+
+      // Doughnut chart data
+      const data = {
+        labels: [
+          "Fan Usage",
+          "Bulb Usage",
+          "TV Usage",
+          "Wash Usage",
+          "Ironbox Usage",
+          "Refrigerator Usage",
+          "Heater Usage",
+          "Oven Usage",
+          "AC Usage",
+          "Device1 Usage",
+          "Device2 Usage",
+          "Device3 Usage",
+        ],
+        datasets: [
+          {
+            data: [
+              fanHours,
+              bulbHours,
+              tvHours,
+              washHours,
+              ironboxHours,
+              refrigeratorHours,
+              heaterHours,
+              ovenHours,
+              acHours,
+              device1Hours,
+              device2Hours,
+              device3Hours,
+            ],
+            backgroundColor: [
+              "#DC143C",
+              "#7DF9FF",
+              "#39FF14",
+              "#FF9505",
+              "#FF69B4",
+              "#FFD300",
+              "#7851A9",
+              "#40E0D0",
+              "#FF00FF",
+              "#32CD32",
+              "#0047AB",
+              "#00FFFF",
+            ],
+            hoverOffset: 4,
+          },
+        ],
+      };
+
+      const config = {
+        type: "doughnut",
+        data: data,
+        options: {
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const label = context.label || "";
+                  const value = context.raw || 0;
+                  const percentage = ((value / totalHours) * 100).toFixed(2);
+                  return `${label}: ${value} hrs (${percentage}%)`;
+                },
+              },
+            },
+          },
+        },
+      };
+
+      // Render chart
+      const ctx = document.getElementById("usageChart").getContext("2d");
+      new Chart(ctx, config);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  </body>
+</html>
